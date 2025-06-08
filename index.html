@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Кешування та оптимізація</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; background: #f7f7f7; }
+    h1, h2 { text-align: center; }
+    form { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+    .gallery { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .gallery img { width: 150px; border-radius: 4px; }
+    #settings { margin-top: 20px; text-align: center; }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <h1>Кешування та оптимізація</h1>
+
+  <!-- Форма -->
+  <form id="userForm">
+    <input type="text" id="username" placeholder="Введіть ім'я">
+    <button type="submit">Зберегти</button>
+  </form>
+
+  <!-- Зображення -->
+  <h2>Галерея</h2>
+  <div class="gallery" id="gallery">
+    <img src="1.JPEG" loading="lazy" alt="Фото 1">
+    <img src="2.JPEG" loading="lazy" alt="Фото 2">
+    <img src="3.JPEG" loading="lazy" alt="Фото 3">
+  </div>
+
+  <!-- Налаштування -->
+  <div id="settings">
+    <h2>Налаштування</h2>
+    <label>
+      <input type="checkbox" id="darkMode"> Темна тема
+    </label>
+  </div>
+
+  <script>
+    // Збереження даних
+    document.getElementById('userForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      localStorage.setItem('username', username);
+      alert('Ім’я збережено!');
+    });
+
+    // Завантаження даних
+    window.addEventListener('load', function() {
+      const savedUsername = localStorage.getItem('username');
+      if (savedUsername) {
+        document.getElementById('username').value = savedUsername;
+      }
+      // Темная тема
+      const darkMode = localStorage.getItem('darkMode') === 'true';
+      document.getElementById('darkMode').checked = darkMode;
+      if (darkMode) document.body.style.background = '#333', document.body.style.color = '#6600cc';
+    });
+
+    // Збереження налаштувань користувача
+    document.getElementById('darkMode').addEventListener('change', function() {
+      localStorage.setItem('darkMode', this.checked);
+      location.reload(); // оновити сторінку для застосування
+    });
+
+    // Кешування
+    const cache = new Map();
+    async function getData(url) {
+      if (cache.has(url)) {
+        console.log('Дані з кешу:', url);
+        return cache.get(url);
+      }
+      const response = await fetch(url);
+      const data = await response.json();
+      cache.set(url, data);
+      console.log('Дані з сервера:', url);
+      return data;
+    }
+	
+    getData('https://jsonplaceholder.typicode.com/posts/1').then(data => {
+      console.log('Пост №1', data);
+    });
+  </script>
+</body>
+</html>
